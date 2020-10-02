@@ -9,33 +9,35 @@
 ***
 
 
+
 ## 2. JDBC Implementation 
+
 #### Step1:	Load driver class into .JVM
 - Methodl: Recommend, driver register via java reflection.
 
-```
+```java
 Class.forName ("com.mysql.jdbc.Driver")
 ```
 - Method2: Driver register via DriverManager.
 
-```
+```javascript
 DriverManager.registerDriver(com.mysql.jdbc.Driver)
 ```
 
 - Method3: Not Recommend, set system properties.
 
-```
+```java
 System.setProperty("jdbc.drivers", "driver1:driver")
 ```
 
 #### Step2:	Create connection
 
-```
+```java
 Connection conn = DriverManager.getConnection(url, user, password);
 URL: JDBC:subProtocal://host:port/database?key=Value&
 ```
 #### Step3: Create statement
-```
+```java
 Statement st = conn.createStatement();
 st.executeQuery(sql);
 
@@ -43,11 +45,10 @@ String sql = "select * from table_name where col_name=?";
 PreparedStatement ps = conn.preparedStatement(sql);
 ps.setString(1, "col_value");
 ps.executeQuery();
-
 ```
 
 #### Step4: Handle Result
-```
+```java
 ResultSet rs = statement.executeQuery(sql);
 While(rs.next()){
 	rs.getString("col_name");
@@ -55,14 +56,17 @@ While(rs.next()){
 ```
 
 #### Step5: Close connection
-```
+```java
 ResultSet.close();
 Statement.close();
 Connection.close();
 ```
-***		
-		
+***
+
+
+
 ## 3. SQL Injection and PrepareStatement
+
 #### SQL Injection
 - select * from user where user_id = <user_id> or 1
 - All records are in the result
@@ -75,7 +79,7 @@ Connection.close();
 	
 ## 4. Data Type	
 #### Data
-```
+```java
 //Write:
 new java.sql.Date(ts.getTime())
 ps.setDate(i,d); 
@@ -89,7 +93,7 @@ rs.getTimestamp(i);
 ```
 
 #### CLOB
-```
+```java
 //Write
 File file = new File(<File_Name>);
 Reader reader = new BufferedReader(new FileReader(file));
@@ -106,7 +110,7 @@ for (int i = 0; (i = reader.read(buff)) > 0;) {
 ```
 
 #### BLOB
-```
+```java
 //Write
 File file = new File("Image.jpg");
 InputStream in = new BufferedInputStream(new FileInputStream(file));
@@ -122,10 +126,12 @@ for (int i = 0; (i = in.read(buff)) > 0;) {
 	System.out.print(new String(buff, 0, i));
 }
 ```
-***		
+***
 
-		
+
+
 ## 5. Dao
+
 - Design interface to decouple business layer and persisent layer
 #### Dao Exception
 - Complie exception: chocked exception, system must handle
@@ -136,7 +142,7 @@ for (int i = 0; (i = in.read(buff)) > 0;) {
 - Load the property file in class path by classLoader
 - Init the Dao Object via reflection
 
-```
+```java
 private DaoFactory() {
 	try {
 		Properties prop = new Properties();
@@ -152,8 +158,8 @@ private DaoFactory() {
 ```
 ***
 
-		
-		
+
+​		
 ## 6. Trasaction
 #### Properties
 - Atomicity: 		All operation commit or all operation rollback
@@ -161,19 +167,19 @@ private DaoFactory() {
 - Isolcation:		Transaction wilL not affect another trasaction
 - Durability:		Transaction persist data
 
-```
-	connection.setAutoConunit (false);
-	connection.commit();
-	connection.rollback();
+```java
+connection.setAutoConunit (false);
+connection.commit();
+connection.rollback();
 ```
 #### Save Point
 - Purpose: Rollback the operation after save point
 - Commmit the operation before save point
- 
-``` 
-	Savepoint sp = connection.setSavepoint;
-	connection.rollback(sp);
-	connection.cocnmit ()
+
+``` java
+Savepoint sp = connection.setSavepoint;
+connection.rollback(sp);
+connection.cocnmit ()
 ```
 #### Java Transaction API
 - Manage trasaction for distributed database
@@ -190,7 +196,7 @@ private DaoFactory() {
 - Set the in parameter
 - Register the out parameter
 
-```
+```java
 String sql = "{ call addUser(?,?,?,?) } ";
 cs = conn.prepareCall(sql);
 cs.setString(1, "ps name");
@@ -199,33 +205,35 @@ cs.setFloat(3, 100f);
 cs.registerOutParameter(4, Types.INTEGER);
 ```
 ***
-	
-	
-	
+
+
+​	
 ## 8. PreparaStatment Batch
 - Processing batch job, fast than multiple insertion/update
 
-```
+```java
 	ProparedStatement pa = connection .prepareStatement (sql)
 	For
 		ps.setData(ldx, value);
 		ps.addbatch();
 	End
 	ps.executeBatch();
-```	
-***	
-	
-	
-## 9 Other API
-#### Get Generated Key
 ```
+***
+
+
+
+## 9 Other API
+
+#### Get Generated Key
+```java
 ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 ps.executeUpdate();
 rs = ps.getGeneratedKeys();
 ```
 #### Rollable ResultSet
 
-```
+```java
 Statement st = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 	ResultSet.CONCUR_UPDATABLE);
 ResultSet rs = st.executeQuery(sql);
 rs.beforeFirst(); rs.afterLast();rs.first();rs.isFirst();rs.last();rs.isLast();
@@ -233,14 +241,14 @@ rs.absolute(9);rs.moveToInsertRow();
 ```
 #### Updatable ResultSet	
 
-```
+```java
 conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
 rs.updateString("col name", "new value");
 rs.updateRow();
 ```
 #### Pagation
 
-```
+```sql
 select * from user limit 5, 10
 ```
 ***
@@ -250,14 +258,14 @@ select * from user limit 5, 10
 ## 10. Metadata
 - Database
 
-```
+```java
 DatabaseMetaData dbmd = conn.getMetaData();
 getDatabaseProductName());
 supportsTransactions());
 ```
 - Parameter
 
-```
+```java
 ParameterMetaData pmd = ps.getParameterMetaData();
 pmd.getParameterClassName(i)
 pmd.getParameterType(i)
@@ -265,15 +273,17 @@ pmd.getParameterTypeName(i)
 ```
 - ResultSet
 
-```
+```java
 ResultSetMetaData rsmd = rs.getMetaData();
 rsmd.getColumnName(i)
 rsmd.getColumnLabel(i)
 ```
-***	
+***
+
 
 
 ## 11. DataSource
+
 #### Connection Pool
 - Build connection at beqining
 - Get connection from connection pool
@@ -293,8 +303,8 @@ rsmd.getColumnLabel(i)
 - Get Connection fast
 - Connection: Proxy Connection
 - Connection Pool: visit DataSource instead of accessing connection pool
- 
-```
+
+```java
 Class.forName("com.mysql.jdbc.Driver");
 Properties prop = new Properties();
 InputStream is = JdbcUtils.class.getClassLoader().getResourceAsStream("dbcpconfig.properties");
@@ -302,13 +312,16 @@ prop.load(is);
 dataSource = BasicDataSourceFactory.createDataSource(prop);
 ```
 ***
-	
+
+
+
 ## 12. Generic Dao Implementation
+
 #### Extend
 - AbstractDao implemnt find() with abstract method rowMapper
 - ConcreteDao extend AbstractDao to call find() with implmented method rowMapper
 
-```
+```java
 AbstractDao{
 	public Object find(String sql, Object[] args) {
 		...
@@ -350,7 +363,7 @@ public class UserDaoImpl extends AbstractDao {
 - AbstractDao implemnt find() with RowMapper interface mapRow method
 - ConcreteDao with AbstractDao reference to call find() with class implmented RowMapper interface
 
-```	
+```	java
 public class DaoTemplate {
 	public Object find(String sql, Object[] args, RowMapper rowMapper) {
 		...
@@ -389,4 +402,5 @@ public class UserDaoImplAdv {
 }
 
 ```
-***	
+***
+
